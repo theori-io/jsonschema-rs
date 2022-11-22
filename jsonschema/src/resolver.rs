@@ -206,7 +206,27 @@ impl Resolver {
 
         // Each resolved document may be in a changed subfolder
         // They are tracked when JSON pointer is resolved and added to the resource
-        let document = self.resolve_url(&resource, orig_ref)?;
+        let root_path = std::env::var("JSONSCHEMA_ROOT_PATH");
+        let document;
+        if url.scheme().eq_ignore_ascii_case("json-schema")
+            && url.path().contains(".json")
+            && root_path.is_ok()
+        {
+            let resource2 = Url::parse(
+                ("file://".to_owned()
+                    + root_path.unwrap().as_str()
+                    + url.path()
+                    + "#"
+                    + url.fragment().unwrap_or_else(|| ""))
+                .as_str(),
+            )
+            .unwrap();
+            println!("New resource is setted: {:?}", resource2);
+            document = self.resolve_url(&resource2, orig_ref)?;
+        } else {
+            document = self.resolve_url(&resource, orig_ref)?;
+        };
+
         if fragment.is_empty() {
             return Ok((resource, Arc::clone(&document)));
         }
