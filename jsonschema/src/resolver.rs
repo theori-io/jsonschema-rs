@@ -221,7 +221,7 @@ impl Resolver {
                 .as_str(),
             )
             .unwrap();
-            println!("New resource is setted: {:?}", resource2);
+            // println!("New resource is set: {:?}", resource2);
             document = self.resolve_url(&resource2, orig_ref)?;
         } else {
             document = self.resolve_url(&resource, orig_ref)?;
